@@ -14,6 +14,8 @@ import { getVectorStore } from "@/lib/astradb";
 import { createRetrievalChain } from "langchain/chains/retrieval";
 import { AIMessage, HumanMessage } from "@langchain/core/messages";
 import { createHistoryAwareRetriever } from "langchain/chains/history_aware_retriever";
+import { UpstashRedisCache } from "langchain/cache/upstash_redis";
+import { Redis } from "@upstash/redis";
 
 export async function POST(req: Request) {
   try {
@@ -30,6 +32,10 @@ export async function POST(req: Request) {
 
     const currentMessageContent = messages[messages.length - 1].content;
 
+    const cache = new UpstashRedisCache({
+        client: Redis.fromEnv(),
+    })
+
     const { stream, handlers } = LangChainStream();
 
     const chatModel = new ChatOpenAI({
@@ -37,12 +43,13 @@ export async function POST(req: Request) {
       streaming: true,
       callbacks: [handlers],
       verbose: true,
-      cache: true,
+      cache,
     });
 
     const rephrasingModel = new ChatOpenAI({
         modelName: "gpt-3.5-turbo",
         verbose: true,
+        cache,
       });
 
     const retriever = (await getVectorStore()).asRetriever(); // const retriever = (await getVectorStore()).asRetriever(10); // 10 is the number of documents to retrieve // By default, it retrieves 4 documents (we anyways have only 4 documents in the vector store for now)

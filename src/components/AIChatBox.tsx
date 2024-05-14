@@ -80,7 +80,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
                 the relevant info on this website.
               </p>
               <p className="text-sm text-muted-foreground">
-                The bot can even provide links to pages you're looking for.
+                The bot can even provide links to pages you&apos;re looking for.
               </p>
             </div>
           )}

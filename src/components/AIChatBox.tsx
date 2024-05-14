@@ -139,8 +139,8 @@ function ChatMessage({ message: { role, content } }: ChatMessageProps) {
           components={{
             a: ({ node, ref, ...props }) => (
               <Link
-                href={props.href ?? ""}
                 {...props}
+                href={props.href ?? ""}
                 className="text-primary hover:underline"
               />
             ),

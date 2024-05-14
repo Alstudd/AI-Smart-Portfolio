@@ -1,6 +1,6 @@
 import { LangChainStream, StreamingTextResponse } from "ai"
 import { ChatOpenAI } from "@langchain/openai"
-import { ChatPromptTemplate } from '@langchain/core/prompts'
+import { ChatPromptTemplate, PromptTemplate } from '@langchain/core/prompts'
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents"
 import { getVectorStore } from "@/lib/astradb"
 import { createRetrievalChain } from "langchain/chains/retrieval"
@@ -39,6 +39,10 @@ export async function POST(req: Request) {
         const combineDocsChain = await createStuffDocumentsChain({
             llm: chatModel,
             prompt,
+            documentPrompt: PromptTemplate.fromTemplate(
+                "Page URL: {url}\n\nPage content:\n{page_content}",
+            ),
+            documentSeparator: "\n--------\n"
         })
 
         const retriever = (await getVectorStore()).asRetriever(); // const retriever = (await getVectorStore()).asRetriever(10); // 10 is the number of documents to retrieve // By default, it retrieves 4 documents (we anyways have only 4 documents in the vector store for now)
